@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>视频播放器</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			.video_player{
+				position: relative;
+				width: 1000px;
+				height: 500px;
+				margin: 0px auto;
+			}
+			video{
+				position: absolute;
+				width: 1000px;
+				height: 500px;
+				left: 0;
+				top: 0;
+			}
+			.menu{
+				position: absolute;
+				width: 100%;
+				height: 40px;
+				background-color: rgba(0,0,0,0.5);
+				bottom: 0;
+				display: none;
+			}
+			.pl{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				border: 1px solid #fff;
+				line-height: 30px;
+				text-align: center;
+				margin-left: 30px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+			}
+			.time{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				line-height: 30px;
+				text-align: center;
+				margin-left: 150px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+			}
+			.pice{
+				position: absolute;
+				width: 100%;
+				height: 2px;
+				background-color: white;
+			}
+			.pice .cover{
+				position: absolute;
+				width: 0;
+				height: 2px;
+				background-color: orange;
+			}
+			.pice i{
+				position: absolute;
+				height: 6px;
+				width: 6px;
+				border-radius: 50%;
+				background-color: skyblue;
+				left: 0;
+				top: -2px;
+			}
+			.quick{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				border: 1px solid #fff;
+				line-height: 30px;
+				text-align: center;
+				left: 300px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			.quick-list{
+				position: absolute;
+				width: 80px;
+				height: 120px;
+				background-color: rgba(0,0,0,0.5);
+				left: 300px;
+				top: -120px;
+				text-align: center;
+				display: none;
+			}
+			.quick-list li{
+				width: 100%;
+				height: 30px;
+				line-height: 30px;
+				cursor: pointer;
+				list-style: none;
+				color: #fff;
+			}
+			.quick-list li:hover{
+				color: orange;
+			}
+			.volum-add{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				border: 1px solid #fff;
+				line-height: 30px;
+				text-align: center;
+				left: 400px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			.volum-ins{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				border: 1px solid #fff;
+				line-height: 30px;
+				text-align: center;
+				left: 480px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			.full-screen{
+				position: absolute;
+				width: 60px;
+				height: 30px;
+				color: #fff;
+				font-size: 20px;
+				border: 1px solid #fff;
+				line-height: 30px;
+				text-align: center;
+				right: 100px;
+				top: calc(50% - 15px);
+				cursor: pointer;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="video_player">
+			<video src="./img/qq.mp4"></video>
+			<div class="menu">
+				<div class="pl">播放</div>
+				<div class="time">0:0</div>
+				<div class="pice">
+					<div class="cover"></div>
+					<i></i>
+				</div>
+				<div class="quick">倍速</div>
+				<div class="quick-list">
+					<ul>
+						<li>正常</li>
+						<li>x1.25</li>
+						<li>x1.5</li>
+						<li>x2</li>
+					</ul>
+				</div>
+				<div class="volum-add">音量+</div>
+				<div class="volum-ins">音量-</div>
+				<div class="full-screen">全屏</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var pl = document.getElementsByClassName('pl')[0];
+			var menu = document.getElementsByClassName('menu')[0];
+			var video = document.getElementsByTagName('video')[0];
+			var time = document.getElementsByClassName('time')[0];
+			var pice = document.getElementsByClassName('pice')[0];
+			var quick = document.getElementsByClassName('quick')[0];
+			var quickList = document.getElementsByClassName('quick-list')[0];
+			var cover = document.getElementsByClassName('cover')[0];
+			var bar = document.getElementsByTagName('i')[0];
+			var fullScreen = document.getElementsByClassName('full-screen')[0];
+			var volumAdd = document.getElementsByClassName('volum-add')[0];
+			var volumIns = document.getElementsByClassName('volum-ins')[0];
+			var list = quickList.getElementsByTagName('ul')[0].getElementsByTagName('li');
+			var videoPlayer = document.getElementsByClassName('video_player')[0];
+			videoPlayer.onmouseenter = function(){
+				menu.style.display = 'block';
+			}
+			videoPlayer.onmouseleave = function(){
+				menu.style.display = 'none';
+			}
+			pl.onclick = function(){
+				if(video.paused){
+					video.play();
+					pl.innerHTML = '暂停';
+				}else{
+					video.pause();
+					pl.innerHTML = '播放';
+				}
+			}
+			setInterval(function(){
+				var totalTime = video.duration;
+				var nowTime = video.currentTime;
+				time.innerHTML = check(parseInt(nowTime / 60)) + ':' + check(parseInt(nowTime % 60)) + '/' + check(parseInt(totalTime / 60)) + ':' + check(parseInt(totalTime % 60));
+				cover.style.width = nowTime / totalTime * video.clientWidth + 'px';
+				bar.style.left = nowTime / totalTime * video.clientWidth + 'px';
+			},1000);
+			function check(date){
+				if(date < 10){
+					date  = '0' + date;
+					return date;
+				}else{
+					return date;
+				}
+			}
+			pice.onmouseenter = function(){
+				pice.style.height = '8px';
+				cover.style.height = '8px';
+				bar.style.height = '12px';
+				bar.style.height = '12px';
+				pice.style.top = '-4px';
+			}
+			pice.onmouseleave = function (){
+				pice.style.height = '2px';
+				cover.style.height = '2px';
+				bar.style.height = '6px';
+				bar.style.height = '6px';
+				pice.style.top = '0px';
+			}
+			pice.onclick = function(e){
+				var location = e.layerX;
+				var width = pice.clientWidth;
+				var targetTime = location / width * video.duration;
+				video.currentTime = targetTime;
+			}
+			quick.onclick = function(){
+				quickList.style.display = 'block';
+			}
+			quickList.onmouseleave = function(){
+				this.style.display = 'none';
+			}
+			for(var i = 0; i < list.length; i ++){
+				list[i].index = i;
+				list[i].onclick = function(){
+					if(this.index == 0){
+						video.playbackRate = 1;
+						quick.innerHTML = '倍速';
+					}else if(this.index == 1){
+						video.playbackRate = 1.25;
+						quick.innerHTML = 'x1.25';
+					}else if(this.index == 2){
+						video.playbackRate = 1.5;
+						quick.innerHTML = 'x1.5';
+					}else{
+						video.playbackRate = 2;
+						quick.innerHTML = 'x2';
+					}
+				}
+			}
+			volumAdd.onclick = function(){
+				video.volume = video.volume + 0.1 > 1 ? 1 : video.volume + 0.1;
+			}
+			volumIns.onclick = function(){
+				video.volume = video.volume - 0.1 < 0 ? 0 : video.volume - 0.1;
+			}
+			var timeOut = null;
+			var lock = true;
+			fullScreen.onclick = function(e){
+				var dom = document.documentElement;
+				dom.requestFullscreen();
+				videoPlayer.style.width = window.screen.width + 'px';
+				videoPlayer.style.height = window.screen.height + 'px';
+				video.style.width = window.screen.width + 'px';
+				video.style.height = window.screen.height + 'px';
+				if(lock){
+					//控制菜单界面消失和出现
+					setInterval(function(){
+						timeOut = setTimeout(function(){
+							if(lock){
+								menu.style.display = 'none';
+								lock = false;
+							}
+							if(!lock){
+									video.onmousemove = function(){
+									clearTimeout(timeOut);
+									menu.style.display = 'block';
+									lock = true;
+								}
+							}
+							console.log(lock);
+						}, 2000);
+					},4000);
+						
+				}
+				
+			}
+		</script>
+	</body>
+</html>
